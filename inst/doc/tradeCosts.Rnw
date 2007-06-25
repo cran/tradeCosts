@@ -1,0 +1,306 @@
+\documentclass{article}
+\pagestyle{headings}
+\usepackage{amsmath}
+\usepackage{fullpage}
+\usepackage{Sweave}
+\DefineVerbatimEnvironment{Sinput}{Verbatim}{fontsize=\small,fontshape=sl}
+\DefineVerbatimEnvironment{Soutput}{Verbatim}{fontsize=\small}
+\DefineVerbatimEnvironment{Scode}{Verbatim}{fontsize=\small,fontshape=sl}
+
+\title{Performing trade costs analysis with the \textbf{\texttt{tradeCosts}} package}
+\author{Aaron Schwartz and Luyi Zhao}
+
+\begin{document}
+\bibliographystyle{plain}
+
+\maketitle
+\SweaveOpts{echo=TRUE, quiet=TRUE}
+\setcounter{secnumdepth}{3}
+
+%%\VignetteIndexEntry{Using the tradeCosts package}
+%%\VignetteDepends{tradeCosts}
+
+<<echo=FALSE, results=hide>>=
+## Sets display options
+op <- options(width = 100, digits = 2, scipen = 5)
+library(tradeCosts)
+@
+
+\begin{abstract}
+\label{abstract}
+For those who frequently engage in trading securities in financial markets, trade costs cannot be overlooked.  Without an understanding of the costs incurred during trading returns can never reach their full potential. The \textbf{\texttt{tradeCosts}} package provides an easy-use to use set of tools for analyzing trade costs by generating automated summaries and PDF reports of trade costs from raw trading data.  The summaries and reports generated allow a user to quickly understand how far their trades executed were from a user-specified benchmark price.
+\end{abstract}
+
+\section{Introduction}
+\label{intro}
+
+\paragraph{} For institutions and individuals that frequently trade securities in financial markets trade costs are an important expense to be considered. A money manager ignoring trade costs can hinder the performance of a portfolio by not understanding the costs of trades being made.  We define trading costs in our package based on the work of Kissell and Glantz's \emph{Optimal Trading Strategies} \cite{kissell:glantz}. As described in their work, trade costs can be thought of to be composed of several distinct elements: commission, fees, spreads, price appreciation, market impact, timing risk, and opportunity cost. Currently, however, the package focuses solely on slippage, which we refer to in this release of the package as cost, as an ex-post measurement of the quality of executions relative to a benchmark price.  
+
+We rank trades by percent cost, which we define in more detail as:
+$$
+\text{\% cost} = 100 * \frac{\text{cost}}{\text{market value of executed shares}},
+$$
+where  
+$$\text{market value of executed shares} = \text{execution quantity} * \text{execution price},$$ 
+and
+$$
+\text{cost} = \text{side adjustment}*\text{execution quantity} * (\text{execution price} - \text{benchmark price}).
+$$
+
+Since we wish for the market value of executed shares to be unsigned, we assume that execution quantity is always positive regardless of the trade's side.  The side adjustment variable is either or $1$ or $-1$ and serves to adjust the sign of cost depending on the side of the trade. In the \textbf{\texttt{tradeCosts}} package, positive cost is considered bad while negative cost is good (Example: a negative percent cost on a buy order indicates that the security was purchased for less than the benchmark price).  Thus for buy and cover orders side adjustment is $1$, and for sell and short orders side adjustment is just $-1$.  Also, total percent costs over a certain time period or security are calculated as the market value weighted average of individual trades. 
+
+Having the ability to quickly and automatically generate reports that provide information about how far trades were being executed from a benchmark price for a certain group of trades can yield valuable information for those trying to improve their returns.  These reports and summaries can help users gain a big picture view of the trade costs for a group of trades and discover specific trades, time periods, or specific securities with unusually high or low trade costs. The package operates through a user interface function, \texttt{analyze.trade.costs} which displays summaries of the input trade data and/or generates PDF summaries. 
+
+\section{Calculating Cost: Examples}
+
+\paragraph{} We now go through simple examples of calculating slippage, or as we refer to it in this release, cost, for individual trades, a period of time, and a security.  
+
+\subsection{Individual Trades}
+
+\paragraph{} First, we examine the process of calculating cost and percent cost for individual trades.  Suppose for March, $14$ $2007$ security FOO had a volume weighted average price (VWAP) of $\$3.13$ and that on that day two shares of FOO were brought at the price of $\$3.15$. The price that we actually bought the securities at, $\$3.15$, is referred to as the execution price, and the VWAP will be the benchmark price for this case.  The number of shares we bought, two, is referred to as the execution quantity. Also, as noted in the previous section, since this is a buy order the side adjustment factor for this order should be $1$.  According to our formula introduced in the introduction, we then calculate cost as:
+\begin{align*}
+\text{cost} &= \text{side adjustment}*\text{execution quantity} * (\text{execution price} - \text{benchmark price})\\
+\text{cost} &= 1 * 2 * (3.15 - 3.13)\\
+\text{cost} &= \$0.04.
+\end{align*}
+Percent cost can then be easily calculated as:
+\begin{align*}
+\text{\% cost} &= 100 * \frac{\text{cost}}{\text{market value of executed shares}}\\
+\text{\% cost} &= 100 * \frac{\text{cost}}{\text{execution quantity} * (\text{execution price})}\\
+\text{\% cost} &= 100 * \frac{0.04}{2 * 3.15}\\
+\text{\% cost} &= 0.63\%
+\end{align*}
+
+Notice that both percent cost and cost are positive which indicate that relative to the benchmark price, the trade described yielded a loss for whoever executed the trade.  If FOO had been sold at $\$3.13$, then our calculations above would have yielded a cost of $-\$0.04$ and a percent cost of $-0.63\%$.  The negative percent cost and cost would have indicated that the transaction, relative to the VWAP benchmark price, was a good trade for whoever bought the two shares of FOO.
+
+\subsection{Security}
+
+\paragraph{} In addition to calculating the cost of an individual trade we can also examine the total trading cost of a security. For example, suppose we have three trades of FOO stock, the details of which are summarized in the table below: 
+\clearpage
+\begin{table}[!h]
+\begin{center}
+\begin{tabular}{rrrrrr}
+  \hline
+  Period & Security Name & Side & Execution Price & Execution Quantity & VWAP \\
+  \hline
+  $2/19/2007$ & FOO & buy & $\$2.23$ & 5 & $\$2.18$\\
+  $3/14/2007$ & FOO & buy & $\$3.15$ & 2 & $\$3.13$\\
+  $4/4/2007$  & FOO & sell & $\$3.51$ & 5 & $\$3.62$\\
+  $4/16/2007$ & FOO & short & $\$4.15$ & 4 & $\$4.28$\\
+   \hline
+\end{tabular}
+\end{center}
+\end{table}
+
+In order to calculate the total cost of the security FOO we simply sum up the costs of each individual trade:
+
+\begin{align*}
+\text{cost} &= \sum (\text{side adjustment}*\text{execution quantity} * (\text{execution price} - \text{benchmark price}))\\
+\text{cost} &= 1*5*(2.23-2.18) + 1*2*(3.15-3.13) + -1*5*(3.51-3.62) + -1*4*(4.15-4.28)\\
+\text{cost} &= 1.36
+\end{align*}
+
+To obtain the total percent cost we divide the total cost by the total market value of all the executions as shown below:
+
+\begin{align*}
+\text{\% cost} &= 100 * \frac{\text{total}}{\sum \text{market value of executed shares}}\\
+\text{\% cost} &= 100 * \frac{1.36}{5*2.23+2*3.15+5*3.51+4*4.15}\\
+\text{\% cost} &= 100 * \frac{1.36}{5*2.23+2*3.15+5*3.51+4*4.15}\\
+\text{\% cost} &= 2.64\%
+\end{align*}
+
+\subsection{Period}
+
+\paragraph{} Similarly, the total cost and percent cost can be found for a certain period of time. Consider the table of trades below:
+
+\begin{table}[!h]
+\begin{center}
+\begin{tabular}{rrrrrr}
+  \hline
+  Period & Security Name & Side & Execution Price & Execution Quantity & VWAP \\
+  \hline
+  $3/14/2007$ & FOO & buy & $\$3.15$ & 2 & $\$3.13$\\
+  $3/14/2007$  & BAR & cover & $\$21.71$ & 5 & $\$22.00$\\
+  $3/14/2007$ & MOR & sell & $\$14.51$ & 4 & $\$14.28$\\
+   \hline
+\end{tabular}
+\end{center}
+\end{table}
+
+Now instead of summing over the trades for a security we group the trades by period, in this case $3/14/2007$, and find the total cost of the trades for $3/14/2007$:
+
+\begin{align*}
+\text{cost} &= \sum (\text{side adjustment}*\text{execution quantity} * (\text{execution price} - \text{benchmark price}))\\
+\text{cost} &= 1*2*(3.15-3.13) + 1*5*(21.71-22.00) + -1*4*(14.51-14.28)\\
+\text{cost} &= -2.33
+\end{align*}
+
+Like before, dividing by the sum of the market values of the executed trades yields the percent cost:
+
+\begin{align*}
+\text{\% cost} &= 100 * \frac{\text{total}}{\sum \text{market value of executed shares}}\\
+\text{\% cost} &= 100 * \frac{1.36}{5*2.23+2*3.15+5*3.51+4*4.15}\\
+\text{\% cost} &= 2.64\%
+\end{align*}
+ 
+\section{Trade Costs Analysis: An Example}
+\label{examples}
+\paragraph{} Here we step through a trade costs analysis using the top-level function \texttt{analyze.trade.costs}.  After understanding the required data, we explain the options available in \texttt{analyze.trade.costs}, call the function, and examine the summary output.
+
+First, we will introduce the raw data sets included in this package: \texttt{trade}, a \texttt{data.frame} of trading data; \texttt{dynamic}, a \texttt{data.frame} of dynamic securities data; and \texttt{static}, a \texttt{data.frame} of static securities data.  Function \texttt{analyze.trade.costs} takes in the trade, dynamic descriptive, and static descriptive data in separate \texttt{data.frames}.  \texttt{trade} includes the IDs of the securities, the time period, side, execution quantity, the execution price:
+
+<<echo = TRUE>>=
+data(trade.mar.2007)
+head(trade.mar.2007, n = 1)
+@
+
+\texttt{dynamic} is a \texttt{data.frame} that represents the dynamic descriptive data and includes the IDs of the securities, the time period, and a benchmark price:
+
+<<echo = TRUE>>=
+data(dynamic.mar.2007)
+head(trade.mar.2007, n = 1)
+@
+
+Finally, we have the \texttt{static}, the static descriptive data, which has the IDs and symbols (an alternative identification from ID) of the securities:
+
+<<echo = TRUE>>=
+data(static.mar.2007)
+head(static.mar.2007, n = 1)
+@
+
+Once the data is loaded with the correct columns, it is time to call \texttt{analyze.trade.costs} This user-level function returns either a text summary generated in the \texttt{R} environment or a PDF report. A \texttt{tradeCostsResults} object is also returned and is explained below in section \ref{overview}.  Below we show the command to use \texttt{analyze.trade.costs} to generate a text summary in \texttt{R} of the trading, static descriptive, and dynamic descriptive data included in this package:
+
+<<echo = TRUE>>=
+analyze.trade.costs(trade.mar.2007, dynamic.mar.2007, static.mar.2007, out.fmt = "text")
+@
+
+Notice that in addition to inputting the three data frames of raw data, the parameter \texttt{out.fmt = "text"} specifies that we want a text summary to be generated.  The text output above generates five distinct tables in the summary output.  As you can see above, the first table  includes summary information of the trade costs analysis for the entire data set. The second, third, and fourth tables show the best and worst trades grouped by \texttt{id}, time period, and individual trades.  The final table is a report on the \texttt{Ca's} found in the data that might be of interest to the user.  
+
+In addition, we can run the same function without inputting static descriptive data. This is useful in instances where alternative identifications such as ticker symbols are not needed or not readily available. We simply run the command without \texttt{static.mar.2007}:
+
+<<echo = TRUE>>=
+analyze.trade.costs(trade.mar.2007, dynamic.mar.2007, out.fmt = "text")
+@
+
+As you can see above the same tables are generated with the exception that there is no field for symbol in the tables.
+
+PDF reports are also easily generated using the \texttt{analyze.trade.costs} function.  The reports contain the same tables and information as the text summaries in a convenient PDF format.  The reports are available in both normal and verbose versions and can be generated by simply changing the \texttt{out.fmt} parameter.  Also, reports can simply be displayed or displayed and saved to a file path specified by the parameter \texttt{pdf.file}. For example, the command:
+\begin{verbatim}
+analyze.trade.costs(trade.mar.2007, dynamic.mar.2007, static.mar.2007, out.fmt = "pdf")
+\end{verbatim}
+\noindent
+would generate and display a normal PDF report of the raw data included in the package while the following line of code:
+\begin{verbatim}
+analyze.trade.costs(trade.mar.2007, dynamic.mar.2007, static.mar.2007, out.fmt = "pdf-verbose")
+\end{verbatim}
+\noindent
+would generate and display a verbose version of the report \emph{and} save the PDF report to the file path specified by \texttt{pdf.file}.  Again, as with the text summaries, static descriptive data is still an optional parameter. Section \ref{user} will explain in more detail the usage of \texttt{analyze.trade.costs} and the requirements for the raw data input.
+
+
+\section{Detailed overview of \textbf{tradeCosts} package}
+\label{overview}
+
+\paragraph{} This section provides overviews of the key components of the \texttt{\textbf{tradeCosts}} package. Specifically, it offers detailed descriptions of the function \texttt{analyze.trade.costs} and classes \texttt{tradeCosts} and \texttt{tradeCostsResults}.
+
+\subsection{User Interface: \texttt{analyze.trade.costs}}
+\label{user}
+
+\paragraph{} To simplify usage of this package a user-level function in the package, \texttt{analyze.trade.costs}, was developed. \texttt{analyze.trade.costs} allows users to input their raw data and specify if they wish to simply display a summary of their trade costs in the \texttt{R} environment and/or generate a verbose or normal PDF report on their trade costs data. The parameters are shown in the function signature below:
+
+\begin{verbatim}
+    function (trade, dynamic, static = NULL, benchmark.price = "vwap", 
+    num.trades = 5, analysis.title = "Trade Cost Analysis", out.fmt = "pdf", 
+    pdf.file = NULL)
+\end{verbatim}
+
+The parameters are explained in more detail below:
+
+\begin{itemize}
+\item \texttt{trade} A \texttt{data.frame} of trading data with the following columns required:
+	\begin{itemize}
+	\item \texttt{id}. the ID of the security being traded.
+	\item \texttt{period}. the time period when the trade was executed.
+	\item \texttt{side}. the\texttt{analyze.trades.costs} side of the trade made. Sides should be indicated by the characters \texttt{B},\texttt {S}, \texttt{X}, and \texttt{C} for buy, sell, short, and cover respectively.
+	\item \texttt{exec.price}. the execution price of the trade.
+	\end{itemize}
+\item \texttt{dynamic.} A \texttt{data.frame} of dynamic data on securities with the following columns required:
+	\begin{itemize}
+	\item \texttt{id}. the ID of the security being traded.
+	\item \texttt{period}. the time period when the trade was executed.
+	\item \texttt{vwap}. the volume weighted average price (VWAP).
+	\end{itemize}
+\item \texttt{static.} A \texttt{data.frame} of static data on securities. By default this slot is \texttt{NULL}. Although the user can specify a \texttt{data.frame} for this slot, it is not necessary for the user to supply static descriptive data. At this stage of the \textbf{\texttt{tradeCosts}} package's development, the only data that would be used from \texttt{static.desc} is \texttt{symbol}, the symbol of the security being traded (an alternate identification from ID).
+
+\item \texttt{benchmark.price.} A \texttt{character} specifying the name of the column of the benchmark price.
+\item \texttt{num.trades.} A number specifying the top \texttt{num.trades} best and worst trades, periods, and securities to be displayed in the text summary and/or PDF reports. If num.trades is $1$, the best and worst trade will be displayed for each category.
+\item \texttt{analysis.title.} The \texttt{character} name of the analysis. By default it is set as \texttt{"Trade Cost Analysis 1.0"}.
+\item \texttt{out.fmt.} A \texttt{character} specifying the report type to be generated. Input \texttt{"pdf"} for a normal PDF report, \texttt{"pdf-verbose"} for a verbose PDF report, or \texttt{"text"} for a text summary of the data displayed in the \texttt{R} console.
+\item \texttt{pdf.file.} A \texttt{character} path to the file you want the PDF report to be saved too.  If a PDF report was not selected as the output type then this argument is ignored. By default, \texttt{pdf.file} is set as \texttt{NULL} - this causes the PDF report to be saved in a temporary directory in \texttt{R}. This temporary directory is also where the all the compiling of \textbf{\texttt{Sweave}} files and \LaTeX\ files are done.
+\end{itemize}
+
+Function \texttt{analyze.trades.costs} works by creating a \texttt{tradeCosts} and \texttt{tradeCostsResults} object from the input data.  The two classes are explained in more detail in the section \ref{tradeCosts}.
+\texttt{analyze.trades.costs} generates its PDF reports by using package \textbf{\texttt{Sweave}} to generate \texttt{tex} files to be compiled from template files found in \texttt{/inst/template/}. Detailed examples of the use of this function were given above in section \ref{examples}.
+
+\subsection{\texttt{tradeCosts} Class}
+\label{tradeCosts}
+
+\paragraph{} The basic structure of the \textbf{\texttt{tradeCosts}} package consists of two classes, \texttt{tradeCosts} and \texttt{tradeCostsResults}.  Class \texttt{tradeCosts} has slots to take in the data required for the trade costs analysis.  To begin an analysis of trade costs, an object of \texttt{tradeCosts} class with the necessary data in its slots is created. The slots are listed and explained in detail below:
+\begin{itemize}
+\item \texttt{name}. A string of the name of this trade costs analysis.
+\item \texttt{trade.data}. A \texttt{data.frame} of trade data with the following columns required:
+	\begin{itemize}
+	\item \texttt{id}. the ID of the security being traded.
+	\item \texttt{period}. the time period when the trade was executed.
+	\item \texttt{side}. the\texttt{analyze.trades.costs} side of the trade made. Sides should be indicated by the characters \texttt{'B'},\texttt {'S'}, \texttt{'X'}, and \texttt{'C'} for buy, sell, short, and cover respectively.
+	\item \texttt{exec.price}. the execution price of the trade.
+	\end{itemize}
+\item \texttt{dynamic.desc}. A \texttt{data.frame} of dynamic data on securities with the following columns required:
+	\begin{itemize}
+	\item \texttt{id}. the ID of the security being traded.
+	\item \texttt{period}. the time period when the trade was executed.
+	\item \texttt{vwap}. the volume weighted average price (VWAP).
+	\end{itemize}
+\item \texttt{static.desc}. A \texttt{data.frame} of static data on securities.Although the user can specify a \texttt{data.frame} for this slot, data from \texttt{static.desc} is not necessary for analysis to proceed.
+\end{itemize}
+
+The \texttt{tradeCosts} also has a method, \texttt{analyzeData}, which merges the \texttt{trade.data}, \texttt{dynamic.desc}, and \texttt{static.desc} data into one data set, counts the number of \texttt{NA}s in the merged data set, calculates cost and percent cost, and removes extraneous columns.  After performing these operations \texttt{mergeData} passes its results into a new object of class \texttt{tradeCostsResults} which is discussed above in section \ref{examples}.
+
+\subsection{\texttt{tradeCostsResults} Class}
+\label{tradeCostsResults}
+
+Class \texttt{tradeCostsResults} stores a single \texttt{data.frame} object containing all the stripped down trade data with cost information. The class also contains methods for calculating summary statistics and generating the text summary and PDF reports.  Its slots are listed and explained in detail below:
+
+\begin{itemize}
+\item \texttt{name.} A string of the name of this trade costs analysis.
+\item \texttt{results.} A \texttt{data.frame} of merged and pared down raw data.
+\item \texttt{na.counts.} A \texttt{data.frame} of counts made of NAs in the raw data
+\end{itemize}
+
+Class \texttt{tradeCostsResults} has two methods which produce end output for the user, \texttt{summary} and \texttt{pdfsummary}. Method \texttt{summary} calculates and displays a text summary report in the \texttt{R} console. Method \texttt{pdfsummary} generates the summary PDF reports, both normal and verbose.
+
+
+\section{Conclusion}
+
+\label{conclusion}
+
+\paragraph{} For those who engage in frequent transactions in financial markets, trade costs can play a pivotal role in portfolio performance.  Institutions and individuals who wish to improve their returns can do so by understanding and carefully managing the costs incurred during trading.  This package provides a set of tools for generating summaries and reports on a component of trade costs, slippage, from raw trading data. 
+
+\begin{quote}
+\small
+Jeff Enos, David Kane, Aaron Schwartz, and Luyi Zhao \\
+  Kane Capital Management \\
+  Cambridge, Massachusetts, USA\\
+  \texttt{jeff@kanecap.com}, \texttt{david@kanecap.com},\\
+  \texttt{aaron.j.schwartz@williams.edu} and \texttt{luyizhao@fas.harvard.edu}
+\end{quote}
+\normalfont
+
+<<echo=FALSE>>=
+options(op)
+@
+
+%%%%%%Bibliography%%%%%%%%%%
+\bibliography{tradeCosts}
+
+
+\end{document}

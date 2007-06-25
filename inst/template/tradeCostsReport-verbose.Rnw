@@ -1,0 +1,83 @@
+
+\documentclass[a4paper]{article}
+\usepackage{amsmath}
+\usepackage{fullpage}
+\usepackage{Sweave}
+
+
+\title{\Sexpr{trade.costs.object@name}}
+\begin{document}
+\maketitle
+
+%%INTRODUCTION%%
+\section{Introduction}
+
+\paragraph{} This document summarizes the trade cost analysis performed by package \texttt{tradeCosts}.  It provides a general overview of trading costs as well as specific information on the best and worst time periods, ids, and individual trades in terms of percentage cost.
+
+%%NOTES ON DATA%%
+\section{Data Description} 
+\paragraph{} The merged data set of raw trading, dynamic descriptive, and static descriptive data had $\Sexpr{trade.costs.object@na.counts$side}$ trades without indication of side, $\Sexpr{trade.costs.object@na.counts$base}$ trades without execution prices, and $\Sexpr{trade.costs.object@na.counts$benchmark.price}$ trades without a benchmark price.  $\Sexpr{trade.costs.object@na.counts$exec.qty}$ did not have execution quantity data.  All trades with missing data were omitted from the final merged dataset and thus analysis.  The final dataset contained $\Sexpr{nrow(trade.costs.object@results)}$ trades that were examined. 
+
+The following two tables summarize the number of NAs found in the data and general statistics about the data inputted for this trade costs analysis.
+
+\vspace{12pt}
+
+\noindent
+\textbf{Summary Statistics}
+<<echo=FALSE>>=
+sumstats <- calcStats(trade.costs.object@results)
+cat(
+    sprintf(" Total Market Value: %17s", format(sumstats$total.mkt.value, big.m = ",")), "\n",
+    sprintf("Total Percent Cost:    %17.2f", sumstats$total.percent.cost), "\n",
+    sprintf("Max Percent Cost:      %17.2f", sumstats$max.percent.cost), "\n", 
+    sprintf("Min Percent Cost:      %17.2f", sumstats$min.percent.cost), "\n",
+    sprintf("First Period:       %17s", sumstats$first.period), "\n",
+    sprintf("Last Period:        %17s", sumstats$last.period), "\n"
+    )
+@
+
+\noindent
+\textbf{NA Counts}
+<<echo = FALSE>>=
+na.counts <- data.frame(t(trade.costs.object@na.counts))
+colnames(na.counts) <- "count"
+show(na.counts)
+@ 
+
+%%TABLE OF SUMMARIES%%
+\section{Summary of Trade Costs}
+\paragraph{} The following tables provide summaries of the worst and best securities, time periods, and individual trades relative to percent trade costs. Note that we define percent trade costs as:
+$$
+\text{\% cost} = 100 * \frac{\text{cost}}{\text{market value of executed shares}},
+$$
+where  
+$$\text{market value of executed shares} = \text{execution quantity} * \text{execution price},$$ 
+and
+$$
+\text{cost} = \text{side adjustment}*\text{execution quantity} * (\text{execution price} - \text{benchmark price}).
+$$
+
+Since we wish for the market value of executed shares to be unsigned, we assume that execution quantity is always positive regardless of the trade's side.  The side adjustment variable is either or $1$ or $-1$ and serves to adjust the sign of cost depending on the side of the trade. In the \textbf{\texttt{tradeCosts}} package, positive cost is considered bad while negative cost is good (Example: a negative percent cost on a buy order indicates that the security was purchased for less than the benchmark price).  Thus for buy and cover orders side adjustment is $1$, and for sell and short orders side adjustment is just $-1$. 
+
+The following three tables consist of the top securities, time periods, and individual trades with the best and worst trades respectively. For each security and time period, percent cost was calculated as the market value weighted average of all individual percent costs for individual trades made for a security or during a time period respectively.
+
+\vspace{12pt}
+
+\textbf{Best and Worst Trades Grouped By ID}
+<<echo=FALSE>>=
+show(calcID(trade.costs.object@results, trade.num.trades))
+@
+\noindent
+\textbf{Best and Worst Trades Grouped By Period}
+<<echo=FALSE>>=
+show(calcPeriod(trade.costs.object@results, trade.num.trades))
+@ 
+\noindent
+\textbf{Best and Worst Individual Trades}
+<<echo=FALSE>>=
+show(calcAll(trade.costs.object@results, trade.num.trades))
+@
+
+\end{document}
+
+

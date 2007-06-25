@@ -1,0 +1,61 @@
+\documentclass[8pt, a4paper]{article}
+\usepackage{amsmath}
+\usepackage{fullpage}
+\usepackage{Sweave}
+\topmargin 5mm
+\pagestyle{empty}
+\begin{document}
+\begin{center}
+\textbf{\Sexpr{trade.costs.object@name}}
+\end{center}
+
+<<echo=FALSE>>=
+op <- options(width = 100, digits = 4, scipen = 5)
+@
+
+\DefineVerbatimEnvironment{Soutput}{Verbatim}{fontsize=\footnotesize} 
+\noindent
+\textbf{Summary Statistics}
+<<echo=FALSE>>=
+sumstats <- calcStats(trade.costs.object@results)
+cat(
+    sprintf(" Total Market Value: %17s", format(sumstats$total.mkt.value, big.m = ",")), "\n",
+    sprintf("Total Percent Cost:    %17.2f", sumstats$total.percent.cost), "\n",
+    sprintf("Max Percent Cost:      %17.2f", sumstats$max.percent.cost), "\n", 
+    sprintf("Min Percent Cost:      %17.2f", sumstats$min.percent.cost), "\n",
+    sprintf("First Period:       %17s", sumstats$first.period), "\n",
+    sprintf("Last Period:        %17s", sumstats$last.period), "\n"
+    )
+@ 
+\noindent
+\textbf{Best and Worst Trades Grouped By ID}
+<<echo=FALSE>>=
+show(calcID(trade.costs.object@results, trade.num.trades))
+@
+\noindent
+\textbf{Best and Worst Trades Grouped By Period}
+<<echo=FALSE>>=
+show(calcPeriod(trade.costs.object@results, trade.num.trades))
+@ 
+\noindent
+\textbf{Best and Worst Individual Trades}
+<<echo=FALSE>>=
+show(calcAll(trade.costs.object@results, trade.num.trades))
+@
+\noindent
+\textbf{NA Counts}
+<<echo = FALSE>>=
+na.counts <- data.frame(t(trade.costs.object@na.counts))
+colnames(na.counts) <- "count"
+show(na.counts)
+@
+
+
+
+<<echo=FALSE>>=
+options(op)
+@
+
+\end{document}
+
+

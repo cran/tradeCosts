@@ -1,0 +1,21 @@
+import(methods)
+exportData(
+          "trade.mar.2007",
+          "dynamic.mar.2007",
+          "static.mar.2007"
+          )
+export(
+       "analyze.trade.costs"
+       )
+exportClasses(
+              "tradeCosts",
+              "tradeCostsResults"
+              )
+exportMethods(
+              "summary",
+              "calcAll",
+              "calcID",
+              "calcPeriod",
+              "calcStats"
+              )
+

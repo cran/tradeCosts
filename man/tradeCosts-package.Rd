@@ -1,26 +1,50 @@
 \name{tradeCosts-package}
 \alias{tradeCosts-package}
+\alias{tradeCosts}
 \docType{package}
-
 \title{
-  Analysing trade cost
+Trade Cost Analysis
 }
 \description{
-  Classes for analysing trade cost.
+Performs ex-post analysis of security transaction costs.
 }
 \details{
-  \tabular{ll}{
-    Package: \tab tradeCosts\cr
-    Type: \tab Package\cr
-    Version: \tab 1.0\cr
-    Date: \tab 2007-06-06\cr
-    Depends: \tab R (>= 2.4.0), methods, xtable, tools\cr
-    License: \tab GPL version 2 or later\cr
-  }
+\tabular{ll}{
+Package: \tab tradeCosts\cr
+Version: \tab 0.2-0\cr
+Date: \tab 2007-09-20\cr
+LazyLoad: \tab yes\cr
+Depends: \tab R (>= 2.4.0), methods, tools, graphics\cr
+License: \tab GPL version 2 or later.\cr
+Built: \tab R 2.5.1; ; 2007-09-20 23:19:45; unix\cr
 }
 
-\author{
-  Aaron Schwartz, Luyi Zhao, Jeff Enos, and David Kane
-  Maintainer: Jeff Enos <jeff@kanecap.com>
+Index:
+\preformatted{
+dynamic.mar.2007        Sample dynamic descriptive data
+static.mar.2007         Sample static descriptive data
+trade.costs             User-level function to perform basic trade cost
+                        analysis.
+trade.mar.2007          Sample trading data
+tradeCosts-class        Class "tradeCosts"
+tradeCosts-package      Trade Cost Analysis
+tradeCostsResults-class
+                        Class "tradeCostsResults"
 }
-\keyword{package}
+
+Further information is available in the following vignettes:
+\tabular{ll}{
+\code{tradeCosts-article} \tab Trade Costs (source, pdf)\cr
+\code{tradeCosts} \tab Using the tradeCosts package (source, pdf)\cr
+}
+}
+\author{
+Arjun Ravi Narayan <contact@arjunnarayan.com>, Aaron Schwartz
+<Aaron.J.Schwartz@williams.edu>, Daniel Suo
+<danielsuo@gmail.com> and Luyi Zhao <luyizhao@fas.harvard.edu>
+with contributions from Jeff Enos <jeff@kanecap.com> and David
+Kane <david@kanecap.com>
+
+Maintainer: Jeff Enos <jeff@kanecap.com>
+}
+\keyword{ package }

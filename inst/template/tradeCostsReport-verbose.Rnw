@@ -16,7 +16,7 @@
 
 %%NOTES ON DATA%%
 \section{Data Description} 
-\paragraph{} The merged data set of raw trading, dynamic descriptive, and static descriptive data had $\Sexpr{trade.costs.object@na.counts$side}$ trades without indication of side, $\Sexpr{trade.costs.object@na.counts$base}$ trades without execution prices, and $\Sexpr{trade.costs.object@na.counts$benchmark.price}$ trades without a benchmark price.  $\Sexpr{trade.costs.object@na.counts$exec.qty}$ did not have execution quantity data.  All trades with missing data were omitted from the final merged dataset and thus analysis.  The final dataset contained $\Sexpr{nrow(trade.costs.object@results)}$ trades that were examined. 
+\paragraph{} The merged data set of raw trading, dynamic descriptive, and static descriptive data had $\Sexpr{trade.costs.object@na.counts$side}$ trades without indication of side, $\Sexpr{trade.costs.object@na.counts$base}$ trades without execution prices, and $\Sexpr{trade.costs.object@na.counts$benchmark.price}$ trades without a benchmark price.  $\Sexpr{trade.costs.object@na.counts$exec.qty}$ did not have execution quantity data.  All trades with missing data were omitted from the final merged dataset and thus analysis.  The final dataset contained $\Sexpr{nrow(trade.costs.object@results)}$ trades that were examined.  The benchmark price used was $\Sexpr{trade.costs.object@benchmark.price}$.
 
 The following two tables summarize the number of NAs found in the data and general statistics about the data inputted for this trade costs analysis.
 
@@ -27,7 +27,8 @@ The following two tables summarize the number of NAs found in the data and gener
 <<echo=FALSE>>=
 sumstats <- calcStats(trade.costs.object@results)
 cat(
-    sprintf(" Total Market Value: %17s", format(sumstats$total.mkt.value, big.m = ",")), "\n",
+    sprintf(" Benchmark price:        %17s", trade.costs.object@benchmark.price), "\n", 
+    sprintf("Total Market Value: %17s", format(sumstats$total.mkt.value, big.m = ",")), "\n",
     sprintf("Total Percent Cost:    %17.2f", sumstats$total.percent.cost), "\n",
     sprintf("Max Percent Cost:      %17.2f", sumstats$max.percent.cost), "\n", 
     sprintf("Min Percent Cost:      %17.2f", sumstats$min.percent.cost), "\n",

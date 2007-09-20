@@ -5,24 +5,26 @@
 \topmargin 5mm
 \pagestyle{empty}
 \begin{document}
+\twocolumn
 \begin{center}
-\textbf{\Sexpr{trade.costs.object@name}}
+\textbf{Trade costs for `` \Sexpr{trade.costs.object@name}} ''
 \end{center}
+\setkeys{Gin}{width=0.4\textwidth}
 
 <<echo=FALSE>>=
 op <- options(width = 100, digits = 4, scipen = 5)
 @
 
 \DefineVerbatimEnvironment{Soutput}{Verbatim}{fontsize=\footnotesize} 
+\
 \noindent
 \textbf{Summary Statistics}
 <<echo=FALSE>>=
-sumstats <- calcStats(trade.costs.object@results)
+sumstats <- calcStats(trade.costs.object@batches)
 cat(
-    sprintf(" Total Market Value: %17s", format(sumstats$total.mkt.value, big.m = ",")), "\n",
-    sprintf("Total Percent Cost:    %17.2f", sumstats$total.percent.cost), "\n",
-    sprintf("Max Percent Cost:      %17.2f", sumstats$max.percent.cost), "\n", 
-    sprintf("Min Percent Cost:      %17.2f", sumstats$min.percent.cost), "\n",
+    sprintf(" Benchmark price:   %17s", trade.costs.object@benchmark.price), "\n", 
+    sprintf("Total Market Value: %17s", format(sumstats$total.mkt.value, big.m = ",")), "\n",
+    sprintf("Total Trade Costs:  %17.2f", sumstats$total.exec.cost), "\n",
     sprintf("First Period:       %17s", sumstats$first.period), "\n",
     sprintf("Last Period:        %17s", sumstats$last.period), "\n"
     )
@@ -30,18 +32,15 @@ cat(
 \noindent
 \textbf{Best and Worst Trades Grouped By ID}
 <<echo=FALSE>>=
-show(calcID(trade.costs.object@results, trade.num.trades))
+out <- tradeCosts:::.getHeadTail(calc(trade.costs.object, "id"), 5)
+show(tradeCosts:::.prettify.df(out))
 @
 \noindent
 \textbf{Best and Worst Trades Grouped By Period}
 <<echo=FALSE>>=
-show(calcPeriod(trade.costs.object@results, trade.num.trades))
+out <- tradeCosts:::.getHeadTail(calc(trade.costs.object, "decision"), 5)
+show(tradeCosts:::.prettify.df(out))
 @ 
-\noindent
-\textbf{Best and Worst Individual Trades}
-<<echo=FALSE>>=
-show(calcAll(trade.costs.object@results, trade.num.trades))
-@
 \noindent
 \textbf{NA Counts}
 <<echo = FALSE>>=
@@ -50,7 +49,26 @@ colnames(na.counts) <- "count"
 show(na.counts)
 @
 
+\begin{figure}[b]
+\centering
+\vspace*{0.1in}
+<<echo=FALSE,fig=TRUE>>=
+plot(trade.costs.object, "time.series")
+@ 
+\caption{\label{figure:timeseries}
+A time series plot of trade costs.}
+\end{figure}
 
+
+\begin{figure}[b]
+\centering
+\vspace*{0.1in}
+<<echo=FALSE,fig=TRUE>>=
+plot(trade.costs.object, "time.series.bps")
+@ 
+\caption{\label{figure:timeseriesbps}
+A time series plot of trade costs in bps.}
+\end{figure}
 
 <<echo=FALSE>>=
 options(op)

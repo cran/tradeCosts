@@ -1,6 +1,6 @@
 #################################################################################
 ##
-## $Id: AllClasses.R 427 2007-06-25 19:13:42Z enos $
+## $Id: AllClasses.R 1171 2007-09-13 15:08:31Z zhao $
 ##
 ## Class definitions for the tradeCosts package.
 ##
@@ -14,31 +14,48 @@
 ## tradeCostsResults class contains the data for working
 ## with the finalize  transaction cost results
 
-
 setClass("tradeCosts",
          representation(
-                        name         = "character",
-                        trade.data   = "data.frame",
-                        dynamic.desc = "data.frame",
-                        static.desc  = "data.frame"
+                        name           = "character",
+                        trade.data     = "data.frame",
+                        dynamic.desc   = "data.frame",
+                        static.desc    = "data.frame",
+                        decisions.data = "data.frame"
                         ),
          
          prototype = prototype(
-           name          = "Trade Cost Analysis",
-           trade.data    = data.frame(),
-           dynamic.desc  = data.frame(),
-           static.desc   = data.frame()
+           name           = "Trade Cost Analysis",
+           trade.data     = data.frame(),
+           dynamic.desc   = data.frame(),
+           static.desc    = data.frame(),
+           decisions.data = data.frame()
          ),
          validity = function(object){
-           
-           ## The Id vars must all be of the same type.
-           
-           if(!isTRUE(all.equal(class(object@dynamic.desc$id),
-                                class(object@trade.data$id)))){
-             return("Id vars must be of the same type")
+
+           ## columns for trade.data
+
+           if(!all(c("id", "period", "side","exec.qty", "exec.price") %in% names(object@trade.data))){
+             stop("Columns of trade.data must include id, period, side, exec.qty, and exec.price.")
            }
 
-           ## The period vars must be of the same type in your data sets
+           ## columns for dynamic.desc
+
+           if(!all(c("id", "period") %in% names(object@dynamic.desc))){
+             stop("Columns of dynamic. data must include id and period.")
+           }
+
+           ## columns for static.desc
+
+           if(!(nrow(object@static.desc) == 0) && !all(c("id", "symbol") %in% names(object@static.desc))){
+             stop("Static descriptive data is not required but if used must contain id and symbol columns")
+           }
+
+           ## columns for decisions.data
+
+           if(!(nrow(object@decisions.data) == 0) && !all(c("id", "side", "period", "qty", "price"))){
+             stop("Decisions is not required but if used must contain id, side, period, qty, and price")
+           }
+             
            
            if(!isTRUE(all.equal(class(object@dynamic.desc$period),
                                 class(object@trade.data$period)))){
@@ -61,16 +78,24 @@ setClass("tradeCosts",
 
 setClass("tradeCostsResults",
          representation(
-                        name       = "character",
-                        results    = "data.frame",
-                        na.counts  = "data.frame"
+                        name             = "character",
+                        executions       = "data.frame",
+                        batches          = "data.frame",
+                        na.counts        = "data.frame",
+                        base.price       = "character",
+                        benchmark.price  = "character",
+                        batch.method     = "character"
                         ),
          
          prototype = prototype(
-           name       = "Trade Cost Analysis",
-           results    = data.frame(),
-           na.counts  = data.frame()
-           )
+           name            = "Trade Cost Analysis",
+           executions      = data.frame(),
+           batches         = data.frame(),
+           na.counts       = data.frame(),
+           base.price      = "exec.qty",
+           benchmark.price = "vwap",
+           batch.method    = "unique"
+          )
          )
          
          

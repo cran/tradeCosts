@@ -1,11 +1,12 @@
 import(methods)
+import(graphics)
 exportData(
           "trade.mar.2007",
           "dynamic.mar.2007",
           "static.mar.2007"
           )
 export(
-       "analyze.trade.costs"
+       "trade.costs"
        )
 exportClasses(
               "tradeCosts",
@@ -13,9 +14,13 @@ exportClasses(
               )
 exportMethods(
               "summary",
+              "show",
+              "calc",
               "calcAll",
               "calcID",
-              "calcPeriod",
-              "calcStats"
+              "calcStats",
+              "pdf",
+              "analyzeData",
+              "plot"
               )
 

@@ -2,7 +2,10 @@
 \docType{class}
 
 \alias{tradeCosts-class}
-\alias{analyzeData,tradeCosts,character,character-method}
+\alias{analyzeData,tradeCosts-method}
+\alias{analyzeData,tradeCosts-method}
+
+\alias{analyzeData}
 
 
 \title{Class "tradeCosts"}
@@ -19,17 +22,18 @@
       with static descriptive security information.}
     \item{\code{dynamic.desc}:}{Object of class \code{"data.frame"}
       with dynamic descriptive security information.}
+    \item{\code{decisions.data}:}{Object of class \code{"data.frame"}
+      with decisions data.}
   }
 }
 
 \section{Methods}{
   \describe{
-    \item{analyzeData}{\code{signature(object = "tradeCosts",
-	base.price = "character", benchmark.price = "character")}:
+    \item{analyzeData}{\code{signature(object = "tradeCosts")}.
       Merges the data, does NA reporting, and calls private functions
       that calculate trade costs.  }
   }
-}
+} 
   
-\author{Aaron Schwartz and Luyi Zhao}
+\author{Aaron Schwartz and Luyi Zhao and Arjun Ravi Narayan}
 \keyword{classes}

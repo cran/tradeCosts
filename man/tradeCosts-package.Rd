@@ -11,12 +11,12 @@ Performs ex-post analysis of security transaction costs.
 \details{
 \tabular{ll}{
 Package: \tab tradeCosts\cr
-Version: \tab 0.2-0\cr
-Date: \tab 2007-09-20\cr
+Version: \tab 0.2-1\cr
+Date: \tab 2007-10-01\cr
 LazyLoad: \tab yes\cr
 Depends: \tab R (>= 2.4.0), methods, tools, graphics\cr
-License: \tab GPL version 2 or later.\cr
-Built: \tab R 2.5.1; ; 2007-09-20 23:19:45; unix\cr
+License: \tab GPL (>= 2)\cr
+Built: \tab R 2.6.0; ; 2007-10-02 09:09:18; unix\cr
 }
 
 Index:

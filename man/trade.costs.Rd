@@ -67,4 +67,4 @@ trade.costs(trade.mar.2007, dynamic.mar.2007,
                     static.mar.2007, num.trades = 3)
 }
 
-\keyword{}
+\keyword{file}

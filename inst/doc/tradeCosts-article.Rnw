@@ -50,7 +50,7 @@ cat.df.without.rownames <- function (d, file = ""){
 Trade costs are the costs a trader must pay to implement a decision to
 buy or sell a security. Consider a single trade of a single equity
 security. Suppose on the evening of August 1, a trader decides to
-purchase 10,000 shares of IBM at \$10, the \emph{decision price} of
+purchase 10,000 shares of IBM at  \$10, the \emph{decision price} of
 the trade.  The next day, the trader's broker buys 10,000 shares in a
 rising market and pays \$11 per share, the trade's \emph{execution price}.
 
@@ -74,56 +74,58 @@ example, the price of \$11 would be a poor price if most transactions
 in IBM on August 2 occurred at \$10.50.  For this purpose a better
 benchmark would be the day's volume-weighted average price, or VWAP.
 If VWAP on August 2 was \$10.50 and the trader used this as her
-benchmark, then the trade cost would be \$0.50 per share, or \$500.
+benchmark, then the trade cost would be \$0.50 per share, or \$5,000.
 
 The first version of the \pkg{tradeCosts} package provides a simple
 framework for calculating the cost of trades relative to a benchmark
-price, such as VWAP or decision price, over multiple periods and basic 
-reporting and plotting facilities to analyse these costs.
+price, such as VWAP or decision price, over multiple periods along
+with basic reporting and plotting facilities to analyse these costs.
 
 \section*{Trade costs in a single period}
 Suppose we want to calculate trade costs for a single period.  First,
 the data required to run the analysis must be assembled into three
-data frames.  A sample of each of the three types of data has been included
-with the package in three data sets.
+data frames.
 
 The first data frame contains all trade-specific information, a sample
 of which is in the \texttt{trade.mar.2007} data frame:
 
 <<echo=TRUE>>=
-library(tradeCosts)
-data(trade.mar.2007)
+library("tradeCosts")
+data("trade.mar.2007")
 head(trade.mar.2007)
 @ 
 
 Trading data must include at least the set of columns included in the
-sample shown above: \texttt{period} is the period during which the
-trade was executed, in this case a calendar trade day; \texttt{id} is
-a unique security identifier; \texttt{side} must be one of \texttt{B}
-(buy), \texttt{S} (sell), \texttt{C} (cover) or \texttt{X} (short
-sell); \texttt{exec.qty} is the number of shares executed; and
-\texttt{exec.price} is the price per share of the execution.
+sample shown above: \texttt{period} is the (arbitrary) time interval
+during which the trade was executed, in this case a calendar trade
+day; \texttt{id} is a unique security identifier; \texttt{side} must
+be one of \texttt{B} (buy), \texttt{S} (sell), \texttt{C} (cover) or
+\texttt{X} (short sell); \texttt{exec.qty} is the number of shares
+executed; and \texttt{exec.price} is the price per share of the
+execution.  The \texttt{create.trade.data} function can be used to
+create a data frame with all of the necessary information.
 
 Second, trade cost analysis requires dynamic descriptive data, or data
 that changes across periods for each security. 
 
 <<echo=TRUE>>=
-data(dynamic.mar.2007)
+data("dynamic.mar.2007")
 head(dynamic.mar.2007[c("period","id","vwap","prior.close")])
 @ 
 
 The \texttt{period} and \texttt{id} columns match those in the trading
 data.  The remaining two columns in the sample are benchmark prices:
 \texttt{vwap} is the volume-weighted average price for the period and
-\texttt{prior.close} is the security's prior period closing price.
+\texttt{prior.close} is the security's price at the end of the prior
+period.
 
-The final data frame contains static data for each security.
+The third data frame contains static data for each security.
 
 \DefineVerbatimEnvironment{Sinput}{Verbatim}{fontsize=\footnotesize,fontshape=sl}
 \DefineVerbatimEnvironment{Soutput}{Verbatim}{fontsize=\footnotesize}
 
 <<echo=TRUE>>=
-data(static.mar.2007)
+data("static.mar.2007")
 head(static.mar.2007)
 @ 
 
@@ -159,8 +161,7 @@ and \texttt{end.period} specify the period range to analyse.  This
 example analyses only one period, March 1, 2007, and uses the
 \texttt{vwap} column of the \texttt{dynamic} data frame as the
 benchmark price. \texttt{result} is an object of class
-\texttt{tradeCostsResults}, upon which we can call the
-\texttt{summary} method:
+\texttt{tradeCostsResults}.
 
 \DefineVerbatimEnvironment{Sinput}{Verbatim}{fontsize=\footnotesize,fontshape=sl}
 \DefineVerbatimEnvironment{Soutput}{Verbatim}{fontsize=\footnotesize}
@@ -172,13 +173,15 @@ summary(result)
 \DefineVerbatimEnvironment{Sinput}{Verbatim}{fontsize=\small,fontshape=sl}
 \DefineVerbatimEnvironment{Soutput}{Verbatim}{fontsize=\small}
 
-The first section of the report above provides high-level summary
+The first section of the report provides high-level summary
 information.  The total unsigned market value of trades for March 1
-was around \$1.3mm.  Relative to VWAP, these trades cost -\$6,491,
-indicating that overall the trades were executed at a level better
-than VWAP.  This total cost is the sum of the signed cost of each
-trade relative to the benchmark price.  As a percentage of total
-executed market value, this set of trades cost -51 bps less than VWAP.
+was around \$1.3 million.  Relative to VWAP, these trades cost
+-\$6,491, indicating that overall the trades were executed at a level
+``better'' than VWAP, where better buys/covers (sells/shorts) occur at
+prices below (above) VWAP.  This total cost is the sum of the signed
+cost of each trade relative to the benchmark price.  As a percentage
+of total executed market value, this set of trades cost -51 bps
+relative to VWAP.
 
 The next section displays the best and worst \emph{batches} over all
 periods.  We will discuss batches in the next section. For now, note
@@ -190,17 +193,17 @@ security on March 1, these results match the best and worst batches by
 cost.
 
 Calculating the cost of a trade requires a non-\texttt{NA} value for
-\texttt{id}, \texttt{period}, \texttt{side}, \texttt{exec.price} and
-\texttt{exec.qty}.  The final section shows a count for each type of
-\texttt{NA} in the input data.  Rows in the input data with
-\texttt{NA}'s in any of these columns are removed before the analysis
-is performed and reported here.
+\texttt{id}, \texttt{period}, \texttt{side}, \texttt{exec.price},
+\texttt{exec.qty} and the benchmark price.  The final section shows a
+count for each type of \texttt{NA} in the input data.  Rows in the
+input data with \texttt{NA}'s in any of these columns are removed
+before the analysis is performed and reported here.
 
 \section*{Costs over multiple periods}
 
 Calculating trade costs over multiple periods works similarly.  Cost
 can be calculated for each trade relative to a benchmark price which
-is either specific to the period of the trade or fixed at the decision
+either varies over the period of the trade or is fixed at the decision
 price.
 
 Suppose, for example, that the trader decided to short a stock on a
@@ -213,18 +216,18 @@ Gaming, PGIC, which has id \texttt{59862K10}:
 subset(trade.mar.2007, id %in% "59862K10")
 @ 
 
-How should the trader calculate the cost of these trades?  One way is
-to calculate the cost for each trade separately relative to a benchmark
-price such as \texttt{vwap}, exactly as in the last example.  In this
-case, the cost of each trade in PGIC would be calculated relative to
-VWAP in each period and then added together.  However, this method
-would ignore the cost associated with spreading out the sale over several
+How should we calculate the cost of these trades?  We could calculate
+the cost for each trade separately relative to a benchmark price such
+as \texttt{vwap}, exactly as in the last example.  In this case, the
+cost of each trade in PGIC would be calculated relative to VWAP in
+each period and then added together.  However, this method would
+ignore the cost associated with spreading out the sale over several
 days.  If the price of the stock had been falling over the four days
-of the sale, as it appears to in this example, successive trades
-appear less attractive when compared to the price at the time of the
-decision.  The trader can capture this cost by grouping the four short
-sales into a \emph{batch} and comparing the execution price of each
-trade to the batch's original decision price.
+of the sale, as in this example, successive trades appear less
+attractive when compared to the price at the time of the decision.
+The trader can capture this cost by grouping the four short sales into
+a \emph{batch} and comparing the execution price of each trade to the
+batch's original decision price.
 
 Performing this type of multi-period analysis using \pkg{tradeCosts}
 requires several modifications to the previous single period example.
@@ -266,38 +269,13 @@ summary(result.batched)
 \DefineVerbatimEnvironment{Sinput}{Verbatim}{fontsize=\small,fontshape=sl}
 \DefineVerbatimEnvironment{Soutput}{Verbatim}{fontsize=\small}
 
-This analysis covers almost \$50mm of executions from March 1 to March
-30, 2007.  Relative to decision price, the trades cost \$587,148, or
-1.23\% of the total executed market value.
+This analysis covers almost \$50 million of executions from March 1 to
+March 30, 2007.  Relative to decision price, the trades cost
+\$587,148, or 1.23\% of the total executed market value.
 
 The most expensive batch in the result contained the four sells in
 PGIC (\texttt{59862K10}) from March 13 to March 20, which cost
-\$182,707.  Below is a list of each trade and its associated cost that
-contributed to this batch's total cost.
-
-<<echo=FALSE>>=
-op <- options()
-options(width = 50)
-@ 
-
-<<echo=FALSE>>=
-subset(result.batched@executions, id %in% "59862K10",
-       select = c("period", "id", "side", "exec.qty", "exec.price",
-         "decision.price", "execution.cost","pct.exe.cost"))
-@ 
-<<echo=FALSE>>=
-options(op)
-@ 
-
-Here \texttt{execution.cost} denotes the dollar cost of the trade
-relative to the benchmark price, and \texttt{pct.exe.cost} reflects
-that cost as a percent of the total executed dollar amount of the
-trade.  The decision price for the batch is \$5.97, the prior closing
-price on March 13.  Note that the benchmark price,
-\texttt{decision.price}, for each trade in this batch is \$5.97.
-Because the price of PGIC was falling over this time period, later
-trades in the batch are more than five times more costly than the
-first trade relative to the decision price.
+\$182,707.
 
 \section* {Plotting results}
 
@@ -306,8 +284,8 @@ displays bar charts of trade costs. It requires two
 arguments, a \texttt{tradeCostsResults} object, and a character string
 that describes the type of plot to create.
 
-The simplest plot, \texttt{time.series.bps} is a time series of total
-trade costs in basis points over each period:
+The simplest plot is a time series of total trade costs in basis
+points over each period:
 
 \begin{figure}
 \centering

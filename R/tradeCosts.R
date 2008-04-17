@@ -1,6 +1,6 @@
 ################################################################################
 ##
-## $Id: tradeCosts.R 1220 2007-09-21 03:05:18Z enos $
+## $Id: tradeCosts.R 1256 2008-04-20 23:10:31Z enos $
 ##
 ## Methods for tradeCosts class
 ##
@@ -30,12 +30,12 @@ setMethod("analyzeData",
             
             if(nrow(object@decisions.data) == 0 &&
                isTRUE(all.equal(benchmark.price,"decision.price"))){
-              merged <- merged[!is.na(merged$prior.close),]
               na.num <- .na.calc(merged, base.price, "prior.close")
+              merged <- merged[!is.na(merged$prior.close),]
             }
             else{
-              merged <- merged[!is.na(merged[[benchmark.price]]),]
               na.num <- .na.calc(merged, base.price, benchmark.price)
+              merged <- merged[!is.na(merged[[benchmark.price]]),]
             }
           
             ## remove bad NA's, remove rows with NAs in:

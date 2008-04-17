@@ -4,7 +4,7 @@
 \alias{tradeCostsResults-class}
 \alias{extremeTrades,tradeCostsResults,numeric,character-method}
 \alias{summary,tradeCostsResults-method}
-\alias{pdf,tradeCostsResults-method}
+\alias{pdfReport,tradeCostsResults-method}
 \alias{calcAll,data.frame,numeric-method}
 \alias{calcID,data.frame,numeric-method}
 \alias{calcPeriod,data.frame,numeric-method}
@@ -18,7 +18,7 @@
 \alias{calcID}
 \alias{calcPeriod}
 \alias{calcStats}
-\alias{pdf}
+\alias{pdfReport}
 
 
 \title{Class "tradeCostsResults"}
@@ -46,7 +46,7 @@
     \item{summary}{\code{signature(object = "tradeCostsResults")}:
       Provides a printout summarizing the \code{tradeCostsResults}
       object.}
-    \item{pdf}{\code{signature(object = "tradeCostsResults")}:
+    \item{pdfReport}{\code{signature(object = "tradeCostsResults")}:
       Provides a pdf summary of the \code{tradeCostsResults} object.}
     \item{calcAll}{\code{signature(results = "data.frame",
       num.trades = "numeric")}: Calculates best/worst trades for all

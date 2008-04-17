@@ -1,6 +1,6 @@
 ################################################################################
 ##
-## $Id: trade.costs.R 1220 2007-09-21 03:05:18Z enos $
+## $Id: trade.costs.R 1256 2008-04-20 23:10:31Z enos $
 ##
 ## function for performing a basic trade cost analysis
 ##
@@ -31,8 +31,8 @@ trade.costs <- function(trade,
     stop("Start period must come before end period.")
   }
 
-  trade   <- subset(trade, period >= start.period & period <= end.period)
-  dynamic <- subset(dynamic, period >= start.period & period <= end.period)
+  trade   <- trade[!is.na(trade$period) & trade$period >= start.period & trade$period <= end.period,]
+  dynamic <- dynamic[!is.na(dynamic$period) & dynamic$period >= start.period & dynamic$period <= end.period,]
   
   ## add some stop?
   

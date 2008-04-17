@@ -1,6 +1,6 @@
 ################################################################################
 ##
-## $Id: tradeCostsResults.R 1218 2007-09-21 02:41:52Z enos $
+## $Id: tradeCostsResults.R 1256 2008-04-20 23:10:31Z enos $
 ##
 ## Methods for tradeCostsResults object
 ## 
@@ -121,7 +121,7 @@ setMethod("plot",
                             ylab = "Cost",
                             las = 2
                             )
-              text(x = mp, y = par("usr")[3] - 2.5, labels = periods,
+              text(x = mp, y = par("usr")[3] - 2.8, labels = periods,
                    srt = 45, adj = 1, xpd = TRUE)
               
             } else if(isTRUE(all.equal(y, "time.series.bps"))) {
@@ -144,7 +144,7 @@ setMethod("plot",
                             ylab = "Basis points",
                             las = 2
                             )
-              text(x = mp, y = par("usr")[3] - 2.5, labels = periods,
+              text(x = mp, y = par("usr")[3] - 2.8, labels = periods,
                    srt = 45, adj = 1, xpd = TRUE)
               
             } else if(isTRUE(all.equal(y, "cumulative"))) {
@@ -207,14 +207,13 @@ setMethod("plot",
               
               bps <- days * 10000 / daysmktvl
               
-              barplot(bps, names = 1:length(bps),
-                      main = "Trade costs by batch period",
-                      sub = "",
-                      xlab = "Period of batch",
-                      ylab = "Basis points",
-                      las = 2
-                      )
-              
+              mp <- barplot(bps,
+                            main = "Trade costs by batch period",
+                            sub = "",
+                            xlab = "Period of batch",
+                            ylab = "Basis points",
+                            names.arg = 1:length(bps)
+                            )
               
             } else if (y %in% names(x@executions)) {
               
@@ -244,12 +243,13 @@ setMethod("plot",
               
               categories <- substring(categories, 1, 6)
               
-              barplot(bps, names = categories,
-                      main = paste("Trade costs by",toString(y)),
-                      ylab = "Basis points",
-                      las=2
-                      )
-              
+              mp <- barplot(bps,
+                            main = paste("Trade costs by",toString(y)),
+                            ylab = "Basis points",
+                            las=2
+                            )
+              text(x = mp, y = par("usr")[3] - 2.6, labels = categories,
+                   srt = 45, adj = 1, xpd = TRUE)
             }
             else {
               warning(paste(y,
@@ -263,7 +263,7 @@ setMethod("plot",
 
 
 
-setMethod("pdf",
+setMethod("pdfReport",
           signature(object = "tradeCostsResults"),
           function(object, num.trades = 5, pdf.file = NULL, out.fmt = "pdf"){
             if("trade.costs.object" %in% ls(.GlobalEnv)){

@@ -6,7 +6,9 @@ exportData(
           "static.mar.2007"
           )
 export(
-       "trade.costs"
+       "trade.costs",
+       "create.trade.data",
+       "create.dynamic.data"
        )
 exportClasses(
               "tradeCosts",
@@ -19,7 +21,7 @@ exportMethods(
               "calcAll",
               "calcID",
               "calcStats",
-              "pdf",
+              "pdfReport",
               "analyzeData",
               "plot"
               )

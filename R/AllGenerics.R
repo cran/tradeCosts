@@ -1,6 +1,6 @@
 ################################################################################
 ##
-## $Id: AllGenerics.R 1150 2007-08-24 15:15:32Z suo $
+## $Id: AllGenerics.R 1256 2008-04-20 23:10:31Z enos $
 ##
 ## Generic Methods
 ##
@@ -10,10 +10,10 @@
 
 
 
-if(!isGeneric("pdf"))
-  setGeneric("pdf",              
+if(!isGeneric("pdfReport"))
+  setGeneric("pdfReport",              
              function(object,
-                      ...) standardGeneric("pdf"))
+                      ...) standardGeneric("pdfReport"))
 
 if(!isGeneric("calc"))
   setGeneric("calc",              

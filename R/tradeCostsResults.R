@@ -1,6 +1,6 @@
 ################################################################################
 ##
-## $Id: tradeCostsResults.R 1256 2008-04-20 23:10:31Z enos $
+## $Id: tradeCostsResults.R 1634 2010-02-18 22:44:18Z enos $
 ##
 ## Methods for tradeCostsResults object
 ## 
@@ -112,7 +112,7 @@ setMethod("plot",
               periods <- periods[order(periods, decreasing = FALSE)]
               
               for(i in 1:length(periods)) {
-                costs[i] <- sum(subset(x@executions, period %in% periods[i])$execution.cost)
+                costs[i] <- sum(x@executions[x@executions$period %in% periods[i],]$execution.cost)
               }
               mp <- barplot(costs,
                             main = "Trade costs by period",
@@ -132,8 +132,8 @@ setMethod("plot",
               periods <- periods[order(periods, decreasing = FALSE)]
               
               for(i in 1:length(periods)) {
-                costs[i] <- sum(subset(x@executions, period %in% periods[i])$execution.cost)
-                mktvl[i] <- sum(subset(x@executions, period %in% periods[i])$exec.mkt.val)
+                costs[i] <- sum(x@executions[x@executions$period %in% periods[i],]$execution.cost)
+                mktvl[i] <- sum(x@executions[x@executions$period %in% periods[i],]$exec.mkt.val)
               }
               
               bps <- costs*10000/mktvl
@@ -228,7 +228,7 @@ setMethod("plot",
               
               for(i in 1:nrow(x@batches)) {
                 x@batches[i,y] <-
-                  subset(x@executions, id %in% as.character(x@batches$id[i]))[y][1,]
+                  x@executions[x@executions$id %in% as.character(x@batches$id[i]),][y][1,]
               }
               
               

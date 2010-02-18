@@ -28,18 +28,19 @@
   \describe{
     \item{\code{name}:}{Object of class \code{"character"} containing
       the name of this trade cost analysis}
-    \item{\code{results}:}{Object of class \code{"data.frame"} that
-      contains the raw trade cost results}
-    \item{\code{na.counts}:}{Objects of class \code{"data.frame"} that
-      contains the raw trade cost results}
      \item{\code{base.price}:}{Object of class \code{"character"} that
       explains what price is being used as the base price.}
     \item{\code{benchmark.price}:}{Object of class \code{"character"} that
       explains what price is being used as the benchmark price.}
     \item{\code{batch.method}:}{Object of class \code{"character"} that
       explains in what way to group the executions for analysis.}
+    \item{\code{na.counts}:}{Object of class \code{"data.frame"} that
+      contains raw trade cost results}
+    \item{\code{batches}:}{Object of class \code{"data.frame"} that
+      contains raw trade cost results}
+    \item{\code{executions}:}{Object of class \code{"data.frame"} that
+      contains raw trade cost results}
   }
-  
 }
 \section{Methods}{
   \describe{
